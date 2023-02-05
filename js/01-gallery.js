@@ -6,9 +6,7 @@ const galleryMarkup = makeGalleryMarkup(galleryItems);
 
 addMarkupOfElement(gallery, galleryMarkup);
 
-let currentModalMarkup = "";
-
-gallery.addEventListener("click", toShowModal);
+gallery.addEventListener("click", showModal);
 
 function makeGalleryMarkup(items = {}) {
   return items
@@ -32,15 +30,22 @@ function addMarkupOfElement(el, murkup) {
   el.innerHTML = murkup;
 }
 
-function toShowModal(event) {
+function showModal(event) {
   if (event.target.nodeName !== "IMG") {
     return;
   }
 
-  currentModalMarkup = makeModalMarkup(event);
+  const currentModalMarkup = makeModalMarkup(event);
   currentModalMarkup.show();
 
-  window.addEventListener("keydown", toCloseModalForEsc);
+  const closeModalForEsc = (event) => {
+    if (event.key === "Escape") {
+      currentModalMarkup.close();
+      window.removeEventListener("keydown", closeModalForEsc);
+    }
+  };
+
+  window.addEventListener("keydown", closeModalForEsc);
 }
 
 function makeModalMarkup(event) {
@@ -48,11 +53,4 @@ function makeModalMarkup(event) {
 
   const link = event.target.dataset.source;
   return basicLightbox.create(`<img src="${link}" width="800" height="600">`);
-}
-
-function toCloseModalForEsc(event) {
-  if (event.key === "Escape") {
-    currentModalMarkup.close();
-    window.removeEventListener("keydown", toCloseModalForEsc);
-  }
 }
